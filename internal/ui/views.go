@@ -103,21 +103,23 @@ func (m *Model) hostView() string {
 	for i, fd := range fields {
 		label := labelStyle.Render(fd.label)
 		if i == m.host.focus {
-			label = cursorStyle.Render(pad(fd.label, 13))
+			label = cursorStyle.Render(pad(fd.label, labelWidth))
 		}
 		b.WriteString(label + " " + m.host.inputs[i].View() + "\n")
 	}
 	other := labelStyle.Render("Other")
 	if m.host.focus == extraIdx {
-		other = cursorStyle.Render(pad("Other", 13))
+		other = cursorStyle.Render(pad("Other", labelWidth))
 	}
 	b.WriteString("\n" + other + "\n" + m.host.extra.View() + "\n")
 
 	group := labelStyle.Render("Group")
 	if m.host.focus == groupIdx {
-		group = cursorStyle.Render(pad("Group", 13))
+		group = cursorStyle.Render(pad("Group", labelWidth))
 	}
-	b.WriteString("\n" + group + " " + boxStyle.Render(m.host.group) + "\n")
+	// the group box is three lines tall: centre the label against it rather
+	// than letting the border spill onto the following lines.
+	b.WriteString("\n" + lipgloss.JoinHorizontal(lipgloss.Center, group+" ", boxStyle.Render(m.host.group)) + "\n")
 	return b.String() + m.footer("tab next  ←/→ group  ctrl+s save  esc cancel")
 }
 
@@ -152,7 +154,7 @@ func (m *Model) settingsView() string {
 	swatch := lipgloss.NewStyle().Foreground(accents[Colors[m.settings.color]]).Render("████ " + Colors[m.settings.color])
 	label := labelStyle.Render("Colour")
 	if m.settings.focus == 1 {
-		label = cursorStyle.Render(pad("Colour", 10))
+		label = cursorStyle.Render(pad("Colour", labelWidth))
 	}
 	b.WriteString("\n" + label + " " + swatch + "\n")
 	return b.String() + m.footer("tab switch  ctrl+n cycle found files  ←/→ colour  enter save  esc back")
@@ -179,7 +181,7 @@ func (m *Model) helpView() string {
 	var b strings.Builder
 	b.WriteString(m.header("keys"))
 	for _, r := range rows {
-		b.WriteString(labelStyle.Render(pad(r[0], 10)) + " " + r[1] + "\n")
+		b.WriteString(labelStyle.Render(pad(r[0], labelWidth)) + " " + r[1] + "\n")
 	}
 	return b.String() + m.footer("any key to go back")
 }

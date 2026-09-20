@@ -99,6 +99,10 @@ func fieldIndex(key string) int {
 }
 
 func (f *hostForm) setWidth(w int) {
+	// the zero-value form has no textarea yet; nothing to resize.
+	if f.inputs == nil {
+		return
+	}
 	for i := range f.inputs {
 		f.inputs[i].Width = w
 	}

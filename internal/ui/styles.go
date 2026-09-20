@@ -13,6 +13,9 @@ var accents = map[string]lipgloss.Color{
 	"purple":  lipgloss.Color("141"),
 }
 
+// labelWidth is the form label column; wide enough for "IdentityFile".
+const labelWidth = 13
+
 // DefaultColor is used when the config names no colour, or an unknown one.
 const DefaultColor = "teal"
 
@@ -31,7 +34,7 @@ var (
 	helpStyle     = lipgloss.NewStyle().Foreground(colMuted)
 	errStyle      = lipgloss.NewStyle().Foreground(colWarn).Bold(true)
 	okStyle       = lipgloss.NewStyle().Foreground(colOK)
-	labelStyle    = lipgloss.NewStyle().Foreground(colMuted).Width(10)
+	labelStyle    = lipgloss.NewStyle().Foreground(colMuted).Width(labelWidth)
 	boxStyle      lipgloss.Style
 
 	// Tab bar: the active tab is underlined in the accent colour, the

@@ -1,0 +1,58 @@
+name: Release
+
+on:
+  push:
+    branches: [master]
+    paths: ['VERSION']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Read VERSION
+        id: version
+        run: echo "version=v$(tr -d ' \n' < VERSION)" >> "$GITHUB_OUTPUT"
+
+      - name: Check tag does not exist
+        id: check
+        run: |
+          if git ls-remote --exit-code --tags origin "refs/tags/${{ steps.version.outputs.version }}" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build binaries
+        if: steps.check.outputs.exists == 'false'
+        run: |
+          mkdir -p dist
+          for target in linux/amd64 linux/arm64 darwin/amd64 darwin/arm64; do
+            export GOOS=${target%/*} GOARCH=${target#*/} CGO_ENABLED=0
+            go build -ldflags "-s -w -X main.version=${{ steps.version.outputs.version }}" \
+              -o "dist/ssh-manager-${GOOS}-${GOARCH}" .
+          done
+          (cd dist && sha256sum * > checksums.txt)
+
+      - name: Create tag and release
+        if: steps.check.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git tag "${{ steps.version.outputs.version }}"
+          git push origin "${{ steps.version.outputs.version }}"
+          gh release create "${{ steps.version.outputs.version }}" \
+            --title "${{ steps.version.outputs.version }}" \
+            --generate-notes \
+            dist/*
