@@ -8,6 +8,15 @@ file `ssh` already reads. Anything it does not manage — `Match` blocks,
 ## Install
 
 ```sh
+curl -fsSL https://raw.githubusercontent.com/scottdsnr/ssh-manager/master/install.sh | sh
+```
+
+Installs the latest release binary into `~/.local/bin`. Override with
+`INSTALL_DIR=/usr/local/bin` or pin a release with `VERSION=v0.1.0`.
+
+Or from source:
+
+```sh
 go install github.com/scotthellings/ssh-manager@latest
 ```
 
