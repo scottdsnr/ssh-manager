@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "repository_id": 1378794136,
+  "issues": {
+    "5723310127": {
+      "number": 1,
+      "horizon": "next",
+      "effort": "xs",
+      "revision": 3688397765418952543,
+      "updated_at": "2026-10-06T05:15:33.201425131Z"
+    }
+  }
+}
